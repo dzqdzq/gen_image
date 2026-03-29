@@ -1,0 +1,87 @@
+---
+name: gen—image
+description: 使用Seedream-5.0 API 生成高质量图片,需要生成图片时使用。适用于文生图、图生图以及生成关联组图的场景, 注意生成的图片不带带透明度的的, 所以需要带透明度的图片, 先生成某个纯色背景的图片,再使用rembg命令进一步处理
+---
+
+# Python 环境（技能/自动化必读）
+
+依赖安装在 **`{baseDir}/scripts/.venv`**。如果 ".venv" 不存在你需要 
+先执行cd {baseDir}/scripts && uv pip install -r requirements.txt
+---
+
+# 使用方法
+
+## 参数说明
+
+- `--prompt`: (必选) 图像生成的文本描述。
+- `--output`: (必选) 本地保存路径：须为**绝对路径**且以 `.png` 结尾，例如 `/path/to/hello.png`。若返回多张图，会保存为 `hello_0.png`、`hello_1.png`（与 `--output` 同目录、同主文件名）。
+- `--size`: (可选) 如 `宽度x高度`；无法解析时原样传给 API。默认2k
+- `--image`: (可选) 图生图需要用到https地址或者本地图片地址. 可以传入多张图
+- `--sequential`: (可选) 开启组图生成功能。
+- `--max-images`: (可选) 组图生成的最大图片数量（1-15）
+
+## 提示词规则
+### 描述建议
+Seedream 5.0  支持文生图、图片编辑、参考图生图、组图生成等多样化任务。为了获得更理想的图像创作效果，建议在编写提示词时注意以下几点：
+1. 用自然语言清晰描述画面
+建议用简洁连贯的自然语言写明 主体 + 行为 + 环境，若对画面美学有要求，可用自然语言或短语补充 风格、色彩、光影、构图 等美学元素。
+- 示例：一个穿着华丽服装的女孩，撑着遮阳伞走在林荫道上，莫奈油画风格。
+- 避免：一个女孩，撑伞，林荫街道，油画般的细腻笔触。
+2. 明确应用场景和用途
+当有明确的应用场景时，推荐在文本提示中写明图像用途和类型。
+- 示例：设计一个游戏公司的 logo，主体是一只在用游戏手柄打游戏的狗，logo 上写有公司名 “PITBULL”。
+- 避免：一张抽象图片，狗拿着游戏手柄，狗狗上写 PITBULL。
+3. 提升风格渲染效果
+如果有明确的风格需求，使用精准的 风格词 或提供 参考图像，能获得更理想的效果。
+
+### 字数建议
+文本提示词（prompt）建议不超过300个汉字或600个英文单词。字数过多信息容易分散，模型可能因此忽略细节，只关注重点，造成图片缺失部分元素
+
+## 文生图
+
+### 文生单张图参考
+通过提供清晰准确的文字指令，即可快速获得符合描述的高质量单张图片。
+```bash
+{baseDir}/scripts/.venv/bin/python {baseDir}/scripts/generate_image.py --prompt "充满活力的特写编辑肖像，模特眼神犀利，头戴雕塑感帽子，色彩拼接丰富，眼部焦点锐利，景深较浅，具有Vogue杂志封面的美学风格，采用中画幅拍摄，工作室灯光效果强烈" --size "2k" --output "/path/to/out.png"
+```
+
+### 文生组图参考
+```bash
+{baseDir}/scripts/.venv/bin/python {baseDir}/scripts/generate_image.py --prompt "生成一组电影级科幻写实风的4张影视分镜：
+场景1为宇航员在空间站维修飞船，空间站外部精密机械结构，深邃星空 + 银河背景，宇航员身穿细节完整的白色宇航服，手持专业维修工具，专注检修飞船外壳，中全景构图，侧逆光勾勒轮廓，冷色调科幻光影，空间站灯光点缀，失重环境，金属质感细腻，画面静谧严谨。
+场景2为：突然遇到陨石带袭击，广角史诗镜头，大量大小不一的陨石高速袭来，陨石表面纹理清晰，带燃烧尾焰，动态模糊体现速度感，陨石带压迫感拉满，飞船与空间站在画面一侧，太空黑暗深邃，光影强烈对比，紧张灾难氛围，画面冲击力十足。
+场景3为：宇航员紧急躲避，近景动态抓拍，宇航员失重状态下极速侧身躲避，肢体动作张力拉满，伸手抓握固定扶手，背景陨石飞掠而过，轻微镜头晃动增强临场感，宇航服褶皱、管线细节清晰，急促紧张，冷冽光影，主体突出不杂乱。
+场景4为：受伤后惊险逃回飞船，中近景叙事镜头，宇航员宇航服带轻微破损划痕，略显狼狈却坚毅，踉跄冲向开启的飞船舱门，舱内暖光与太空冷光形成对比，背景陨石逐渐远去，惊险逃生氛围，细节真实，情绪饱满。" --size "1024x1024"  --sequential --max-images 4 --output "/path/to/storyboard.png"
+```
+
+## 图生图
+支持通过一张或者多张图片和文字信息，生成漫画分镜、品牌视觉,游戏序列帧动画等一组内容关联的图片.
+
+### 图文生图(单图输入单图输出)
+基于已有图片，结合文字指令进行图像编辑，包括图像元素增删、风格转化、材质替换、色调迁移、改变背景/视角/尺寸等。
+```bash
+{baseDir}/scripts/.venv/bin/python {baseDir}/scripts/generate_image.py --prompt "保持模特姿势和液态服装的流动形状不变。将服装材质从银色金属改为完全透明的清水（或玻璃）。透过液态水流，可以看到模特的皮肤细节。光影从反射变为折射。" --image "https://ark-project.tos-cn-beijing.volces.com/doc_image/seedream4_5_imageToimage.png" --output "/path/to/edit.png"
+```
+
+### 单张生成组图(单图输入组图输出)
+参考一张图以及提示词描述，生成一组内容关联的图片（最多 15 张）：
+```bash
+{baseDir}/scripts/.venv/bin/python {baseDir}/scripts/generate_image.py --prompt "参考这个LOGO，做一套户外运动品牌视觉设计，品牌名称为“GREEN”，包括包装袋、帽子、卡片、挂绳等。绿色视觉主色调，趣味、简约现代风格" --image "https://ark-project.tos-cn-beijing.volces.com/doc_image/seedream4_imageToimages.png" --sequential --max-images 4 --output "/path/to/series.png"
+```
+
+### 多图融合(多图输入单图输出)
+根据您输入的文本描述和多张参考图片，融合它们的风格、元素等特征来生成新图像。如衣裤鞋帽与模特图融合成穿搭图，人物与风景融合为人物风景图等。
+```bash
+{baseDir}/scripts/.venv/bin/python {baseDir}/scripts/generate_image.py --prompt "参考这个LOGO，做一套户外运动品牌视觉设计，品牌名称为“GREEN”，包括包装袋、帽子、卡片、挂绳等。绿色视觉主色调，趣味、简约现代风格" --image "https://ark-project.tos-cn-beijing.volces.com/doc_image/seedream4_imageToimages.png" --sequential --max-images 4 --output "/path/to/series.png"
+```
+
+### 多参考图生组图
+```bash
+{baseDir}/scripts/.venv/bin/python {baseDir}/scripts/generate_image.py --prompt "生成3张女孩和奶牛玩偶在游乐园开心地坐过山车的图片，涵盖早晨、中午、晚上" --image "https://ark-project.tos-cn-beijing.volces.com/doc_image/seedream4_imagesToimages_1.png, https://ark-project.tos-cn-beijing.volces.com/doc_image/seedream4_imagesToimages_2.png" --size 2k --sequential --max-images 3 --output "/path/to/series.png"
+
+## 工作流
+
+1. 调用 `generate_image.py` 脚本（图片会先按 `--size` 解析结果做 LANCZOS 缩放）。
+2. 脚本会输出 `SAVED:` 本地路径
+3. 除非用户要求，否则无需再单独下载图片。
+4. 根据实际图片使用场景可能需要使用移除背景技能,对背景进行处理
