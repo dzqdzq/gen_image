@@ -154,10 +154,9 @@ def generate_image(
     }
 
     if image_input:
-        if isinstance(image_input, str):
-            payload["image"] = get_image_url(image_input)
-        elif isinstance(image_input, list):
-            payload["image"] = [get_image_url(image) for image in image_input]
+        if isinstance(image_input, (list, tuple)):
+            imgs = [get_image_url(x) for x in image_input]
+            payload["image"] = imgs[0] if len(imgs) == 1 else imgs
         else:
             print("ERROR: Invalid image input type")
             sys.exit(1)
@@ -221,7 +220,12 @@ def main():
         default="1024x1024",
         help="宽x高 或 宽*高（如 1024x1024）；总像素会被约束在 API 允许区间，必要时生成后再缩放回目标尺寸",
     )
-    parser.add_argument("--image", help="Input images URL")
+    parser.add_argument(
+        "--image",
+        nargs="+",
+        metavar="PATH_OR_URL",
+        help="参考图，可多个：URL 或本地路径。示例：--image /a.png /b.png 或 --image https://...",
+    )
     parser.add_argument(
         "--sequential", action="store_true", help="Enable sequential image generation (group)"
     )
@@ -235,7 +239,7 @@ def main():
         prompt=args.prompt,
         size=args.size,
         output_path=args.output,
-        image_input=args.image,
+        image_input=list(args.image) if args.image else None,
         sequential=args.sequential,
         max_images=args.max_images,
     )
