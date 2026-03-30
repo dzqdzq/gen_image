@@ -47,26 +47,37 @@ Seedream 5.0  支持文生图、图片编辑、参考图生图、组图生成等
 
 ## 单图生成示例
 单图就是模型输出1张图，注意模型会根据提示词可能会输出几张图的图集(比如序列帧动画)
-### 文生单张图参考
-通过提供清晰准确的文字指令，即可快速获得符合描述的高质量单张图片。
+
 ```bash
+# 通过提供清晰准确的文字指令，即可快速获得符合描述的高质量单张图片。
 ${generate_image_cmd} \ 
 --prompt "充满活力的特写编辑肖像，模特眼神犀利，头戴雕塑感帽子，色彩拼接丰富，眼部焦点锐利，景深较浅，具有Vogue杂志封面的美学风格，采用中画幅拍摄，工作室灯光效果强烈" \
 --size "2k" \
 --output "/path/to/out.png"
-```
 
-### 图文生图(单图输入单图输出)
-基于已有图片，结合文字指令进行图像编辑，包括图像元素增删、风格转化、材质替换、色调迁移、改变背景/视角/尺寸等。
-```bash
+# 基于已有图片，结合文字指令进行图像编辑，包括图像元素增删、风格转化、材质替换、色调迁移、改变背景/视角/尺寸等。
 ${generate_image_cmd} \
 --image "/path/to/样图.png" \
 --prompt "保持模特姿势和液态服装的流动形状不变。将服装材质从银色金属改为完全透明的清水（或玻璃）。透过液态水流，可以看到模特的皮肤细节。光影从反射变为折射。"
 --size "750x1520" \
 --output "/path/to/save_name.png"
+
+# 生成小狗摇尾巴序列帧，用于游戏，实际生成的图片是24张图的图集
+${generate_image_cmd} \
+--image "/path/to/小狗.jpeg" \
+--prompt "生成「狗摇尾巴」的序列帧动画素材。同一品种、毛色、体型与光照不变，摄像机机位与背景固定，仅尾巴与臀部连带动作做循环式摆动。从尾巴下垂准备摆动开始，经左右摇摆到回到近似起始姿态，动作流畅、节奏轻快，适合循环播放。24 帧逐帧连贯，帧与帧间隙2像素隔开, 每帧姿态变化均匀，无跳变、无穿模；风格统一、清晰，适合游戏或 UI 动效使用。" \
+--size '2048x2048' \
+--output "/path/to/save_name.png"
+
+${generate_image_cmd} \ 
+--image "https://ark-project.tos-cn-beijing.volces.com/doc_image/seedream4_imageToimages.png" \
+--prompt "参考这个LOGO，做一套户外运动品牌视觉设计，品牌名称为“GREEN”，包括包装袋、帽子、卡片、挂绳等。绿色视觉主色调，趣味、简约现代风格" \
+--output "/path/to/save_name.png"
 ```
 
-### 文生组图参考
+## 组图生成示例
+支持通过一张或者多张图片和文字信息，生成漫画分镜、品牌视觉,游戏序列帧动画等一组内容关联的图片. 组图也可能会输出一张图集
+
 ```bash
 ${generate_image_cmd} \ 
 --prompt "生成一组电影级科幻写实风的4张影视分镜：
@@ -77,40 +88,8 @@ ${generate_image_cmd} \
 --size "1024x1024" \
 --sequential \
 --output "/path/to/save_name.png"
-```
 
-## 组图生成示例
-支持通过一张或者多张图片和文字信息，生成漫画分镜、品牌视觉,游戏序列帧动画等一组内容关联的图片.
-
-### 参考单张图生成组图
-参考一张图以及提示词描述，生成一组内容关联的图片
-```bash
-# 生成某品牌系列的图片，实际生成的图片是4张图的图集
-${generate_image_cmd} \ 
---image "https://ark-project.tos-cn-beijing.volces.com/doc_image/seedream4_imageToimages.png" \
---prompt "参考这个LOGO，做一套户外运动品牌视觉设计，品牌名称为“GREEN”，包括包装袋、帽子、卡片、挂绳等。绿色视觉主色调，趣味、简约现代风格" \
---sequential \
---output "/path/to/save_name.png"
-
-# 生成小狗摇尾巴序列帧，用于游戏，实际生成的图片是24张图的图集
-${generate_image_cmd} \
---image "/path/to/小狗.jpeg" \
---prompt "生成做一条「狗摇尾巴」的序列帧动画素材。同一品种、毛色、体型与光照不变，摄像机机位与背景固定，仅尾巴与臀部连带动作做循环式摆动。从尾巴下垂准备摆动开始，经左右摇摆到回到近似起始姿态，动作流畅、节奏轻快，适合循环播放。24 帧逐帧连贯，帧与帧间隙2像素隔开, 每帧姿态变化均匀，无跳变、无穿模；风格统一、清晰，适合游戏或 UI 动效使用。" \
---size '2048x2048' \
---output "/path/to/save_name.png"
-```
-
-### 多图融合(多图输入单图输出)
-根据您输入的文本描述和多张参考图片，融合它们的风格、元素等特征来生成新图像。如衣裤鞋帽与模特图融合成穿搭图，人物与风景融合为人物风景图等。
-```bash
-${generate_image_cmd} \ 
---prompt "参考这个LOGO，做一套户外运动品牌视觉设计，品牌名称为“GREEN”，包括包装袋、帽子、卡片、挂绳等。绿色视觉主色调，趣味、简约现代风格" --image "https://ark-project.tos-cn-beijing.volces.com/doc_image/seedream4_imageToimages.png" \
---sequential \
---output "/path/to/save_name.png"
-```
-
-### 多参考图生组图
-```bash
+# 多图融合
 ${generate_image_cmd} \
 --image "/Volumes/ext/public/gen_image/tests/locals/多参考图/1.png" "/Volumes/ext/public/gen_image/tests/locals/多参考图/1.png" \
 --prompt "将图1的服装换为图2的服装" \
