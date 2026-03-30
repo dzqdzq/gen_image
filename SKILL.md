@@ -69,17 +69,26 @@ ${generate_image_cmd} \
 --size '2048x2048' \
 --output "/path/to/save_name.png"
 
+# 生成品牌周边
 ${generate_image_cmd} \ 
 --image "/Volumes/ext/public/gen_image/tests/locals/单图生成组图.png" \
 --prompt "参考这个LOGO，做一套户外运动品牌视觉设计，品牌名称为“GREEN”，包括包装袋、帽子、卡片、挂绳等。绿色视觉主色调，趣味、简约现代风格" \
 --size '512x512' \
 --output "/path/to/save_name.png"
+
+# 多张参考图生图（输入多张参考图，融合它们的风格、元素等特征来生成新图）
+${generate_image_cmd} \
+--image "/Volumes/ext/public/gen_image/tests/locals/多参考图/1.png" "/Volumes/ext/public/gen_image/tests/locals/多参考图/2.png" \
+--prompt "将图1的服装换为图2的服装" \
+--size 2k \
+--output "/path/to/save_name.png"
 ```
 
 ## 组图生成示例
-支持通过一张或者多张图片和文字信息，生成漫画分镜、品牌视觉,游戏序列帧动画等一组内容关联的图片. 组图也可能会输出一张图集
+支持通过一张或者多张图片和文字信息，生成漫画分镜、品牌视觉等一组内容关联的图片。注意组图也可能输出包含几张图内容的图集，不一定是输出多张图，是否输出多张取决于模型的理解
 
 ```bash
+# 文生组图，会输出4张图
 ${generate_image_cmd} \ 
 --prompt "生成一组电影级科幻写实风的4张影视分镜：
 场景1为宇航员在空间站维修飞船，空间站外部精密机械结构，深邃星空 + 银河背景，宇航员身穿细节完整的白色宇航服，手持专业维修工具，专注检修飞船外壳，中全景构图，侧逆光勾勒轮廓，冷色调科幻光影，空间站灯光点缀，失重环境，金属质感细腻，画面静谧严谨。
@@ -90,13 +99,8 @@ ${generate_image_cmd} \
 --sequential \
 --output "/path/to/save_name.png"
 
-# 多图融合
-${generate_image_cmd} \
---image "/Volumes/ext/public/gen_image/tests/locals/多参考图/1.png" "/Volumes/ext/public/gen_image/tests/locals/多参考图/1.png" \
---prompt "将图1的服装换为图2的服装" \
---size 2k \
---sequential \
---output "/path/to/save_name.png"
+# 图生组图，写真
+
 ```
 
 ## 工作流
