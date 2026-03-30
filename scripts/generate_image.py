@@ -132,7 +132,6 @@ def generate_image(
     output_path,
     image_input=None,
     sequential=False,
-    max_images=1,
 ):
     validate_output_path(output_path)
 
@@ -161,11 +160,7 @@ def generate_image(
             print("ERROR: Invalid image input type")
             sys.exit(1)
 
-    if sequential:
-        payload["sequential_image_generation"] = "auto"
-        payload["sequential_image_generation_options"] = {"max_images": max_images}
-    else:
-        payload["sequential_image_generation"] = "disabled"
+    payload["sequential_image_generation"] = "auto" if sequential else "disabled"
 
     try:
         response = requests.post(url, headers=headers, json=payload)
@@ -229,9 +224,6 @@ def main():
     parser.add_argument(
         "--sequential", action="store_true", help="Enable sequential image generation (group)"
     )
-    parser.add_argument(
-        "--max-images", type=int, default=1, help="Max images for sequential generation (1-15)"
-    )
 
     args = parser.parse_args()
 
@@ -241,7 +233,6 @@ def main():
         output_path=args.output,
         image_input=list(args.image) if args.image else None,
         sequential=args.sequential,
-        max_images=args.max_images,
     )
 
 if __name__ == "__main__":
